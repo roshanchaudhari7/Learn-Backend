@@ -65,6 +65,35 @@ app.get("/sub", (req, res) => {
     });
 });
 
+// Define a GET route for division with dynamic URL parameters :num and :den
+app.get("/div/:num/:den", (req, res) => {
+    // Log the URL parameters to the console for debugging
+    console.log(req.params);
+
+    // Destructure 'num' (numerator) and 'den' (denominator) from the URL parameters
+    const { num, den } = req.params;
+
+    // Check if either 'num' or 'den' is missing
+    if (!num || !den) {
+        return res.send(`Data is missing: num1 = ${num}, num2 = ${den}`);
+    }
+
+    // Check if the denominator is zero (as a string)
+    if (den === "0") {
+        return res.send("Denominator can not be zero");
+    }
+
+    // Convert the string values to integers and perform division
+    const result = parseInt(num) / parseInt(den);
+
+    // Return the division result in a JSON response
+    return res.send({
+        status: 200,
+        message: "Div success",
+        result: result,
+    });
+});
+
 // Start the server and listen on the defined port
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
