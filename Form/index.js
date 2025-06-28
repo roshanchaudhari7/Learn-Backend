@@ -1,11 +1,23 @@
 const express = require("express");
-const app = express();
+const mongoose = require("mongoose");
+const userModel = require("./userModel");
 const PORT = 5001;
+
+const app = express();
+const MONGO_URI = "mongodb+srv://roshan:2846@cluster1.ss5qyvp.mongodb.net/TestDatabase"
+
+mongoose.connect(MONGO_URI)
+    .then(() => {
+        console.log("Mongodb connected successfully");
+    }).catch((err) => {
+        console.log(err);
+    })
 
 app.get('/', (req, res) => {
     return res.send("Server app is running");
 })
 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/get-form', (req, res) => {
@@ -38,10 +50,34 @@ app.get('/get-form', (req, res) => {
     `)
 })
 
-app.post("/api/form_submit", (req, res) => {
+app.post("/api/form_submit", async (req, res) => {
     console.log(req.body);
-    return res.send(req.body);
-})
+    const nameC = req.body.username;
+    const emailC = req.body.email;
+    const passwordC = req.body.password;
+
+    const userObj = new userModel({
+        username: nameC,
+        email: emailC,
+        password: passwordC
+    })
+    console.log(userObj);
+
+    try {
+        const userDb = await userObj.save();
+        return res.send({
+            status: 201,
+            message: "user created successfully",
+            data: userDb
+        });
+    } catch (error) {
+        return res.send({
+            status: 500,
+            message: "Database error",
+            error: error
+        });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
