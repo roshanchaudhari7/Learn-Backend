@@ -1,12 +1,28 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const userModel = require("./userModel");
-const app = express();
+const session = require("express-session");
+const mongoDbSession = require("connect-mongodb-session")(session);
 const PORT = 5001;
+const app = express();
 const MONGO_URI = "mongodb+srv://roshan:2846@cluster1.ss5qyvp.mongodb.net/TestSession";
+
+const store = new mongoDbSession({
+    uri: MONGO_URI,
+    collection: "sessions",
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+    session({
+        secret: "This is a session Authentication",
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+    })
+);
+
 mongoose.connect(MONGO_URI)
     .then(() => {
         console.log("Mongodb connected successfully");
@@ -117,7 +133,11 @@ app.post('/login', async (req, res) => {
         if (password !== userDb.password) {
             return res.send("Password does not matched");
         }
+
         console.log(userDb);
+        console.log(req.session);
+        req.session.isAuth = true;
+        console.log(req.session);
 
         return res.send({
             status: 200,
@@ -131,6 +151,15 @@ app.post('/login', async (req, res) => {
         });
     }
 
+})
+
+app.get('/products', (req, res) => {
+    console.log(req.session);
+    if (req.session.isAuth) {
+        return res.send("All Products List");
+    } else {
+        return res.send("Session expired, please login again");
+    }
 })
 
 app.listen(PORT, () => {
