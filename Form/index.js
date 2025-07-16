@@ -1,12 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const userModel = require("./userModel");
-const PORT = 5001;
+require('dotenv').config();
+const PORT = process.env.PORT;
 
 const app = express();
-const MONGO_URI = "mongodb+srv://roshan:2846@cluster1.ss5qyvp.mongodb.net/TestDatabase"
 
-mongoose.connect(MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("Mongodb connected successfully");
     }).catch((err) => {
