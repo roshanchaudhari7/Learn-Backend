@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const userModel = require("./userModel");
 const session = require("express-session");
 const mongoDbSession = require("connect-mongodb-session")(session);
-const PORT = 5001;
+require("dotenv").config();
+const PORT = process.env.PORT || 5001;
 const app = express();
-const MONGO_URI = "mongodb+srv://roshan:2846@cluster1.ss5qyvp.mongodb.net/TestSession";
 
 const store = new mongoDbSession({
-    uri: MONGO_URI,
+    uri: process.env.MONGO_URI,
     collection: "sessions",
 });
 
@@ -23,7 +23,7 @@ app.use(
     })
 );
 
-mongoose.connect(MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("Mongodb connected successfully");
     }).catch((err) => {
